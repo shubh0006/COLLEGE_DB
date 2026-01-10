@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 30px;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        th { background: #eee; }
+        .pending { color: orange; font-weight: bold; }
+        .resolved { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h2>Student Complaint Dashboard</h2>
+
+<div class="card">
+    <h3>Add Complaint</h3>
+    <form action="/add_complaint" method="POST">
+        <input type="text" name="issue_type" placeholder="Issue Type" required>
+        <textarea name="description" placeholder="Description" required></textarea>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>My Complaints</h3>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Issue</th>
+            <th>Description</th>
+            <th>Status</th>
+        </tr>
+
+        {% for c in complaints %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.issue_type }}</td>
+            <td>{{ c.description }}</td>
+            <td>
+                {% if c.status == "Pending" %}
+                    <span class="pending">Pending</span>
+                {% else %}
+                    <span class="resolved">Resolved</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<a href="/logout">Logout</a>
+
+</body>
+</html>
