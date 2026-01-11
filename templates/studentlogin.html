@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Signup</title>
+    <title>Student Login</title>
     <style>
         body {
             margin: 0;
@@ -20,6 +20,10 @@
             border-radius: 10px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
         }
 
         input {
@@ -45,6 +49,10 @@
             background: #5a6acb;
         }
 
+        p {
+            margin-top: 15px;
+        }
+
         a {
             color: #6a7bd1;
             text-decoration: none;
@@ -55,15 +63,15 @@
 <body>
 
 <div class="card">
-    <h2>Student Signup</h2>
+    <h2>Student Login</h2>
 
     <form method="POST">
         <input type="email" name="email" placeholder="Email" required>
         <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Signup</button>
+        <button type="submit">Login</button>
     </form>
 
-    <p>Already registered? <a href="/student/login">Login</a></p>
+    <p>New student? <a href="/student/signup">Signup here</a></p>
 </div>
 
 </body>

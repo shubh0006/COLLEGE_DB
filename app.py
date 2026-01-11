@@ -5,25 +5,21 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # APP SETUP 
 app = Flask(__name__)
-app.secret_key = "secret123"
+app.secret_key = "super-secret-key"
 
-# PATH FIX 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
 
 if not os.path.exists(INSTANCE_DIR):
     os.makedirs(INSTANCE_DIR)
 
-# DATABASE CONFIG 
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "sqlite:///" + os.path.join(INSTANCE_DIR, "users.db")
-)
+#  DATABASE 
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(INSTANCE_DIR, "users.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# DATABASE MODELS 
-
+#  MODELS 
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
@@ -44,7 +40,8 @@ class Complaint(db.Model):
 # HOME 
 @app.route("/")
 def home():
-    return redirect("/student/login")
+    return render_template("index.html")
+
 
 # STUDENT SIGNUP 
 @app.route("/student/signup", methods=["GET", "POST"])
@@ -59,11 +56,12 @@ def student_signup():
         student = Student(email=email, password=password)
         db.session.add(student)
         db.session.commit()
+
         return redirect("/student/login")
 
     return render_template("student_signup.html")
 
-# STUDENT LOGIN 
+#STUDENT LOGIN 
 @app.route("/student/login", methods=["GET", "POST"])
 def student_login():
     if request.method == "POST":
@@ -71,14 +69,16 @@ def student_login():
         password = request.form["password"]
 
         student = Student.query.filter_by(email=email).first()
+
         if student and check_password_hash(student.password, password):
+            session.clear()
             session["role"] = "student"
             session["student_id"] = student.id
             return redirect("/student/dashboard")
 
         return "Invalid student credentials"
 
-    return render_template("student_login.html")
+    return render_template("studentlogin.html")   
 
 # STUDENT DASHBOARD 
 @app.route("/student/dashboard")
@@ -92,7 +92,7 @@ def student_dashboard():
 
     return render_template("dashboard.html", complaints=complaints)
 
-# ADD COMPLAINT (STUDENT ONLY)
+#  ADD COMPLAINT 
 @app.route("/add_complaint", methods=["POST"])
 def add_complaint():
     if session.get("role") != "student":
@@ -106,6 +106,7 @@ def add_complaint():
         issue_type=issue_type,
         description=description
     )
+
     db.session.add(c)
     db.session.commit()
 
@@ -119,14 +120,16 @@ def admin_login():
         password = request.form["password"]
 
         admin = Admin.query.filter_by(username=username).first()
+
         if admin and check_password_hash(admin.password, password):
+            session.clear()
             session["role"] = "admin"
             session["admin_id"] = admin.id
             return redirect("/admin/dashboard")
 
         return "Invalid admin credentials"
 
-    return render_template("admin_login.html")
+    return render_template("adminlogin.html")  
 
 # ADMIN DASHBOARD 
 @app.route("/admin/dashboard")
@@ -135,35 +138,35 @@ def admin_dashboard():
         return redirect("/admin/login")
 
     complaints = Complaint.query.all()
-    return render_template("admin_dashboard.html", complaints=complaints)
+    return render_template("admindashboard.html", complaints=complaints)
 
-#UPDATE STATUS (ADMIN ONLY) 
+#  UPDATE STATUS
 @app.route("/update_status/<int:cid>")
 def update_status(cid):
     if session.get("role") != "admin":
         return "Unauthorized", 403
 
-    complaint = Complaint.query.get(cid)
-    if complaint:
-        complaint.status = "Resolved"
+    c = Complaint.query.get(cid)
+    if c:
+        c.status = "Resolved"
         db.session.commit()
 
     return redirect("/admin/dashboard")
 
-# DELETE COMPLAINT (ADMIN ONLY) 
+# DELETE COMPLAINT
 @app.route("/delete_complaint/<int:cid>")
 def delete_complaint(cid):
     if session.get("role") != "admin":
         return "Unauthorized", 403
 
-    complaint = Complaint.query.get(cid)
-    if complaint:
-        db.session.delete(complaint)
+    c = Complaint.query.get(cid)
+    if c:
+        db.session.delete(c)
         db.session.commit()
 
     return redirect("/admin/dashboard")
 
-# LOGOUT 
+#  LOGOUT 
 @app.route("/logout")
 def logout():
     session.clear()
@@ -174,11 +177,11 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-        # default admin create (one-time)
-        if not Admin.query.filter_by(username="admin").first():
+        #  FIXED ADMIN CREDENTIAL
+        if not Admin.query.filter_by(username="haldia321").first():
             admin = Admin(
-                username="admin",
-                password=generate_password_hash("admin")
+                username="haldia321",
+                password=generate_password_hash("54321")
             )
             db.session.add(admin)
             db.session.commit()
