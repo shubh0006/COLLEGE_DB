@@ -38,7 +38,7 @@ Admin management panel
 Simple and user-friendly interface
 
 💻Tech Stack
-Frontend: HTML, CSS, JavaScript
+Frontend: HTML
 Backend language: Python 
 Backend Framework:Flask 
 Database: CSV file based storage 
